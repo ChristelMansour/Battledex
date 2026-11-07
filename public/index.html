@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BattleDex</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>BattleDex</h1>
+    <p class="tagline">Who would win?</p>
+  </header>
+
+  <main>
+    <!-- View 1: input form (the only view visible on load) -->
+    <section id="view-form" class="view">
+      <form id="fight-form" class="card" novalidate>
+        <label for="fighter-a">Fighter A</label>
+        <input id="fighter-a" name="fighterA" type="text" maxlength="60" placeholder="e.g. 10 cows" autocomplete="off">
+
+        <p class="vs" aria-hidden="true">VS</p>
+
+        <label for="fighter-b">Fighter B</label>
+        <input id="fighter-b" name="fighterB" type="text" maxlength="60" placeholder="e.g. 10 lions" autocomplete="off">
+
+        <button type="submit" class="btn">Fight!</button>
+      </form>
+    </section>
+
+    <!-- View 2: loading -->
+    <section id="view-loading" class="view" hidden>
+      <div class="card loading-card" role="status" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>The judge is deciding…</p>
+      </div>
+    </section>
+
+    <!-- View 3: result -->
+    <section id="view-result" class="view" hidden>
+      <div class="card">
+        <p class="result-label">Winner</p>
+        <h2 id="winner-name" class="winner-name"></h2>
+
+        <div class="fighters">
+          <figure class="fighter">
+            <img id="image-a" alt="">
+            <figcaption id="caption-a"></figcaption>
+          </figure>
+          <figure class="fighter">
+            <img id="image-b" alt="">
+            <figcaption id="caption-b"></figcaption>
+          </figure>
+        </div>
+
+        <p id="reasoning" class="reasoning"></p>
+
+        <button type="button" class="btn js-new-fight">New fight</button>
+      </div>
+    </section>
+
+    <!-- View 4: error -->
+    <section id="view-error" class="view" hidden>
+      <div class="card error-card" role="alert">
+        <h2>Oops!</h2>
+        <p id="error-message">Something went wrong.</p>
+        <button type="button" class="btn js-new-fight">Try again</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

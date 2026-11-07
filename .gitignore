@@ -1,0 +1,9 @@
+# Secrets: API keys live here, never commit them
+.env
+.env.local
+
+# Created by Vercel CLI when you link the project
+.vercel
+
+node_modules
+.env*

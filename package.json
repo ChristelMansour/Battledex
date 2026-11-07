@@ -1,0 +1,12 @@
+{
+  "name": "BattleChristel",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "vercel dev",
+    "build": "echo No build step needed: plain HTML, CSS and JS"
+  },
+  "devDependencies": {
+    "vercel": "^65.12.1"
+  }
+}
