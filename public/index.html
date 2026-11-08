@@ -4,67 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BattleDex</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%23e6e6e6%22/%3E%3Cpath d=%22M50 80 C22 62 16 42 28 31 C38 23 48 28 50 37 C52 28 62 23 72 31 C84 42 78 62 50 80 Z%22 fill=%22%23f48fb1%22 stroke=%22%23000%22 stroke-width=%225%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
-    <h1>BattleDex</h1>
-    <p class="tagline">Who would win?</p>
+    <div class="brand">
+      <h1>BattleDex</h1>
+      <p class="tagline">Who would win?</p>
+    </div>
+    <button type="button" id="open-dex" class="btn btn-ghost dex-button">
+      My BattleDex <span id="dex-count" class="count-badge">0</span>
+    </button>
   </header>
 
   <main>
     <!-- View 1: input form (the only view visible on load) -->
     <section id="view-form" class="view">
-      <form id="fight-form" class="card" novalidate>
-        <label for="fighter-a">Fighter A</label>
-        <input id="fighter-a" name="fighterA" type="text" maxlength="60" placeholder="e.g. 10 cows" autocomplete="off">
+      <form id="fight-form" class="card form-card" novalidate>
+        <div class="field">
+          <label for="fighter-a">Fighter A</label>
+          <input id="fighter-a" name="fighterA" type="text" maxlength="60" placeholder="e.g. 10 cows" autocomplete="off">
+        </div>
 
-        <p class="vs" aria-hidden="true">VS</p>
+        <p class="vs-divider" aria-hidden="true"><span>VS</span></p>
 
-        <label for="fighter-b">Fighter B</label>
-        <input id="fighter-b" name="fighterB" type="text" maxlength="60" placeholder="e.g. 10 lions" autocomplete="off">
+        <div class="field">
+          <label for="fighter-b">Fighter B</label>
+          <input id="fighter-b" name="fighterB" type="text" maxlength="60" placeholder="e.g. 10 lions" autocomplete="off">
+        </div>
 
-        <button type="submit" class="btn">Fight!</button>
+        <button type="submit" class="btn btn-primary btn-block">Fight!</button>
       </form>
     </section>
 
-    <!-- View 2: loading -->
+    <!-- View 2: loading (covers the whole wait for the fight call) -->
     <section id="view-loading" class="view" hidden>
       <div class="card loading-card" role="status" aria-live="polite">
-        <div class="spinner" aria-hidden="true"></div>
-        <p>The judge is deciding…</p>
+        <div class="vs-spinner" aria-hidden="true">
+          <span class="orb orb-a"></span>
+          <span class="vs-core">VS</span>
+          <span class="orb orb-b"></span>
+        </div>
+        <p id="loading-text" class="loading-text">Sizing up the fighters…</p>
+        <div class="progress" aria-hidden="true"><div id="progress-bar" class="progress-bar"></div></div>
       </div>
     </section>
 
-    <!-- View 3: result -->
+    <!-- View 3: result (winner card) -->
     <section id="view-result" class="view" hidden>
-      <div class="card">
-        <p class="result-label">Winner</p>
-        <h2 id="winner-name" class="winner-name"></h2>
+      <article id="result-card" class="card result-card">
+        <p class="eyebrow">The judge has spoken</p>
+        <h2 class="winner-heading"><span id="winner-name"></span> wins!</h2>
 
-        <div class="fighters">
-          <figure class="fighter">
-            <img id="image-a" alt="">
+        <div class="matchup">
+          <figure id="corner-a" class="fighter">
+            <span class="tag"></span>
+            <div class="portrait"><img id="image-a" alt=""></div>
             <figcaption id="caption-a"></figcaption>
+            <button type="button" class="btn btn-secondary btn-small js-save" data-corner="A">♡ Save</button>
           </figure>
-          <figure class="fighter">
-            <img id="image-b" alt="">
+
+          <span class="vs-badge" aria-hidden="true">VS</span>
+
+          <figure id="corner-b" class="fighter">
+            <span class="tag"></span>
+            <div class="portrait"><img id="image-b" alt=""></div>
             <figcaption id="caption-b"></figcaption>
+            <button type="button" class="btn btn-secondary btn-small js-save" data-corner="B">♡ Save</button>
           </figure>
         </div>
 
+        <p id="save-status" class="save-status" role="status"></p>
         <p id="reasoning" class="reasoning"></p>
 
-        <button type="button" class="btn js-new-fight">New fight</button>
-      </div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary js-new-fight">New fight</button>
+          <button type="button" class="btn btn-secondary js-open-dex">My BattleDex</button>
+        </div>
+      </article>
     </section>
 
     <!-- View 4: error -->
     <section id="view-error" class="view" hidden>
       <div class="card error-card" role="alert">
+        <div class="error-icon" aria-hidden="true">!</div>
         <h2>Oops!</h2>
         <p id="error-message">Something went wrong.</p>
-        <button type="button" class="btn js-new-fight">Try again</button>
+        <button type="button" class="btn btn-primary js-new-fight">Try again</button>
+      </div>
+    </section>
+
+    <!-- View 5: BattleDex (saved fighters) -->
+    <section id="view-dex" class="view" hidden>
+      <div class="card dex-card-panel">
+        <div class="dex-header">
+          <h2>My BattleDex</h2>
+          <button type="button" id="clear-dex" class="btn-link">Clear all</button>
+        </div>
+        <p id="dex-empty" class="dex-empty">No fighters saved yet. Win (or lose) a fight, then tap “Save to BattleDex”.</p>
+        <ul id="dex-grid" class="dex-grid"></ul>
+        <div class="actions">
+          <button type="button" id="back-to-fight" class="btn btn-secondary">Back to last fight</button>
+          <button type="button" class="btn btn-primary js-new-fight">New fight</button>
+        </div>
       </div>
     </section>
   </main>
