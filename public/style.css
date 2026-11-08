@@ -1220,6 +1220,367 @@ main {
   .btn-chunky.white { font-size: 13px; }
 }
 
+/* ------------------------------------------------------------------ Tablet */
+
+@media (min-width: 600px) {
+  .app {
+    max-width: 640px;
+  }
+}
+
+/* ----------------------------------------------------------------- Desktop
+   Fills the screen: content up to 1560px wide, full-width bottom nav, and
+   two-column layouts for each view. Mobile styles above stay untouched. */
+
+@media (min-width: 900px) {
+  .app {
+    max-width: none;
+  }
+
+  main {
+    width: 100%;
+    max-width: 1560px;
+    margin: 0 auto;
+    padding: 12px 40px 48px;
+  }
+
+  .topbar {
+    padding: 24px 0 0;
+  }
+
+  .chip-dark,
+  .pixel-note {
+    font-size: 11px;
+  }
+
+  /* Pick fighters: P1 · VS · P2 side by side */
+  .hero {
+    padding-top: 16px;
+  }
+
+  .logo {
+    font-size: 96px;
+    text-shadow: 6px 6px 0 var(--pink), 11px 11px 0 var(--ink);
+  }
+
+  .pill {
+    font-size: 15px;
+    padding: 8px 20px;
+  }
+
+  .marquee {
+    margin: 32px -40px 0;
+    padding: 10px 0;
+    transform: rotate(-1.5deg);
+  }
+
+  .marquee-track {
+    font-size: 13px;
+  }
+
+  .fight-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0;
+    padding: 48px 0 0;
+  }
+
+  .player-card {
+    padding: 22px;
+    gap: 20px;
+  }
+
+  .avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+  }
+
+  .avatar svg {
+    width: 80px;
+    height: 80px;
+  }
+
+  .player-field label {
+    font-size: 14px;
+  }
+
+  .player-field input {
+    height: 56px;
+    font-size: 20px;
+  }
+
+  .vs-coin {
+    margin: 0 -26px;
+    width: 92px;
+    height: 92px;
+    font-size: 34px;
+  }
+
+  .form-actions {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding-top: 40px;
+  }
+
+  .btn-fight {
+    height: 80px;
+    font-size: 36px;
+  }
+
+  /* Loading: panels split left / right with the burst in the middle */
+  .vs-stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 -40px;
+  }
+
+  .vs-panel {
+    height: 420px;
+  }
+
+  .panel-p1 {
+    clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+  }
+
+  .panel-p2 {
+    margin-top: 0;
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .panel-p1 .vs-fighter {
+    left: 40px;
+    top: 48px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .panel-p2 .vs-fighter {
+    right: 40px;
+    bottom: 48px;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+  }
+
+  .vs-avatar {
+    width: 168px;
+    height: 168px;
+    border-radius: 36px;
+  }
+
+  .vs-avatar svg {
+    width: 140px;
+    height: 140px;
+  }
+
+  .vs-name {
+    max-width: 360px;
+  }
+
+  .vs-name .pixel {
+    font-size: 11px;
+  }
+
+  .vs-name .display {
+    font-size: 34px;
+  }
+
+  .vs-burst {
+    top: 50%;
+    width: 200px;
+    height: 200px;
+    margin: -100px 0 0 -100px;
+  }
+
+  .burst-spin {
+    width: 200px;
+    height: 200px;
+  }
+
+  .burst-text {
+    font-size: 58px;
+  }
+
+  .loading-info {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-top: 40px;
+  }
+
+  .loading-text {
+    font-size: 15px;
+  }
+
+  .segments span {
+    height: 30px;
+  }
+
+  .tip {
+    font-size: 16px;
+  }
+
+  /* Result: spotlight on the left, defeated row + actions on the right */
+  .result {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-areas:
+      "top      top"
+      "spot     defeated"
+      "spot     status"
+      "spot     actions"
+      "spot     link"
+      "spot     .";
+    grid-template-rows: auto auto auto auto auto 1fr;
+    column-gap: 56px;
+    align-items: start;
+  }
+
+  .result .topbar { grid-area: top; }
+  .spotlight-wrap { grid-area: spot; margin: 54px 16px 0; }
+  .defeated { grid-area: defeated; margin: 54px 0 0; padding: 18px; }
+  .save-status { grid-area: status; margin: 16px 0 0; text-align: left; }
+  .result .result-actions { grid-area: actions; padding: 8px 0 0; }
+  .result .text-link { grid-area: link; margin: 8px 0 0; justify-self: start; }
+
+  .ko-title {
+    font-size: 40px;
+  }
+
+  .spotlight {
+    gap: 14px;
+    padding: 48px 28px 28px;
+  }
+
+  .portrait {
+    width: 220px;
+    height: 220px;
+    border-radius: 40px;
+  }
+
+  .winner-name {
+    font-size: 40px;
+  }
+
+  .reasoning {
+    font-size: 17px;
+  }
+
+  .verdict {
+    padding: 16px 20px;
+  }
+
+  .verdict-label {
+    font-size: 10px;
+  }
+
+  .portrait.small {
+    width: 96px;
+    height: 96px;
+    border-radius: 20px;
+  }
+
+  .loser-name {
+    font-size: 26px;
+  }
+
+  .ko-stamp {
+    font-size: 24px;
+  }
+
+  .btn-chunky {
+    min-height: 64px;
+  }
+
+  .btn-chunky.pink {
+    font-size: 21px;
+  }
+
+  .btn-chunky.white {
+    font-size: 17px;
+  }
+
+  /* Error: centered card */
+  .error-card {
+    max-width: 560px;
+    margin: 64px auto 0;
+    padding: 48px 40px 36px;
+  }
+
+  .error-card h2 {
+    font-size: 32px;
+  }
+
+  #error-message {
+    font-size: 18px;
+  }
+
+  /* BattleDex: wider header row and grid */
+  #view-dex {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 32px;
+    align-items: end;
+  }
+
+  .dex-head { grid-column: 1; padding: 32px 0 0; }
+  .dex-stats { grid-column: 2; padding: 32px 0 0; }
+  .search { grid-column: 1 / -1; margin: 28px 0 0; }
+  .dex-empty { grid-column: 1 / -1; margin: 24px 0 0; }
+  .dex-grid { grid-column: 1 / -1; }
+
+  .dex-title {
+    font-size: 64px;
+    text-shadow: 4px 4px 0 var(--lilac);
+  }
+
+  .dex-sub {
+    font-size: 16px;
+  }
+
+  .stat .display {
+    font-size: 32px;
+  }
+
+  .dex-grid {
+    padding: 28px 0 4px;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 20px;
+  }
+
+  .dex-card {
+    padding: 12px 12px 16px;
+    gap: 10px;
+  }
+
+  .dex-card img {
+    width: 128px;
+    height: 128px;
+    border-radius: 26px;
+  }
+
+  .dex-name {
+    font-size: 17px;
+  }
+
+  #view-dex .result-actions {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 28px 0 0;
+  }
+
+  /* Bottom nav: full-width bar, buttons centered */
+  .bottom-nav {
+    grid-template-columns: repeat(2, 240px);
+    justify-content: center;
+    gap: 16px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
