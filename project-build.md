@@ -110,7 +110,7 @@ We build one stage at a time and only move on when the current stage passes its 
 
 **Done when:** Full app feels like one designed product, no more placeholder styling on any view.
 
-_Note: the Claude Design MCP was not available in this build, so the redesign was done directly in `public/style.css` following brief §5._
+_Note: the design was taken from the user's Claude Design export `Battleground.html` (Battleground Arcade) and implemented directly in `public/index.html` + `public/style.css`. Extra UI from the design: Shuffle random fighters, Rematch, BattleDex search, bottom Arena/Battledex nav, round counter._
 
 ---
 
