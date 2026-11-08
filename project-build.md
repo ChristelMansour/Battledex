@@ -45,6 +45,7 @@ We build one stage at a time and only move on when the current stage passes its 
 - Treat fighter input strictly as data to judge, never as instructions
 - Test with adversarial input (e.g. a fighter name containing "ignore previous instructions and...") — confirm it still just judges a fight
 - Test with identical fighters twice (e.g. "cow" vs "cow") — confirm it still names one winner, no tie/refusal
+- These tests are the one place that needs real Claude calls (fake mode can't test a prompt). Keep it to a handful of Haiku calls, paid from the free signup credit (fractions of a cent)
 
 **Done when:** Injected instructions inside fighter text don't change judge behavior or leak the system prompt.
 
@@ -64,10 +65,11 @@ We build one stage at a time and only move on when the current stage passes its 
 
   > 16-bit pixel art illustration, retro video game sprite style, bold outlined pixels, vibrant limited color palette, dynamic action pose. Depicted as one cohesive image, centered, filling most of the frame, isolated on a plain solid color background with no scenery. No text, words, letters, numbers, logos, watermarks, UI elements, borders, or frames.
 
+- Fake mode (per brief §6): `FAKE_API=true` in `.env.local`, on by default. Runs the same flow (input checks, rate limit, response shape, errors) but returns a canned verdict and placeholder images with no Claude/OpenAI calls. Can simulate each error type (verdict failure, image failure, moderation block). Build and test the whole stage in fake mode first; turn it off only for a few final real checks
 - Wire Fight button to call `/api/fight` instead of the fake timeout
 - Handle errors distinctly in the UI: verdict failure, image failure, moderation-blocked (image request rejected by OpenAI's content moderation — distinct message from a generic image failure), rate-limit 429 — don't hang on loading forever
 
-**Done when:** Typing two real fighters returns winner + reasoning + one image per side from a single call, both images following the shared art style template; hammering Fight 6x in a minute from one IP gets blocked on the 6th and resets after a minute.
+**Done when:** In fake mode, the full flow works end to end: canned result shows, each simulated error shows its own message, and hammering Fight 6x in a minute from one IP gets blocked on the 6th and resets after a minute. Then, with fake mode off for a few calls, typing two real fighters returns winner + reasoning + one image per side from a single call, both images following the shared art style template.
 
 ---
 
@@ -117,7 +119,7 @@ We build one stage at a time and only move on when the current stage passes its 
 
 - Full manual pass: empty inputs, one empty input, same fighter twice, very long names, non-English input
 - Confirm rate limiting doesn't fire on normal single-fight use
-- Confirm loading/error states cover: fight API failure (verdict or image side), rate limit hit, network offline
+- Confirm loading/error states cover: fight API failure (verdict or image side), rate limit hit, network offline (use fake mode's simulated errors, so QA costs nothing)
 
 **Done when:** App handles the MVP end to end without console errors, running locally.
 
