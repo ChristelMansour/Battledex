@@ -1,4 +1,6 @@
-// Stage 1: static UI shell. Uses fake data only. No network calls.
+// Stage 3: the Fight button calls /api/fight for a real (or fake-mode) verdict.
+
+const REQUEST_TIMEOUT_MS = 30_000; // loading never hangs forever
 
 // The four views. Only one is ever visible at a time.
 const views = {
@@ -15,36 +17,21 @@ function showView(name) {
   }
 }
 
-// Make a placeholder image (a pastel square with the fighter's first letter).
-// Real AI art replaces this in Stage 3.
-function placeholderImage(name) {
-  const first = Array.from(name.trim())[0] || "?"; // works for emoji and non-English letters too
-  // Escape characters that would break the SVG markup
-  const letter = first.toUpperCase().replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-      <rect width="100" height="100" fill="#e4dcf5"/>
-      <text x="50" y="62" font-size="40" text-anchor="middle"
-            font-family="sans-serif" fill="#8e6cc4">${letter}</text>
-    </svg>`;
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-}
+// Fill the result view from the API response.
+function showResult(data) {
+  const { A, B } = data.fighters;
+  const winnerName = data.winner === "A" ? A.name : B.name;
 
-// Fill the result view with a fake verdict.
-function showFakeResult(fighterA, fighterB) {
-  const winner = Math.random() < 0.5 ? fighterA : fighterB;
+  document.getElementById("winner-name").textContent = winnerName;
+  document.getElementById("reasoning").textContent = data.reasoning;
 
-  document.getElementById("winner-name").textContent = winner;
-  document.getElementById("reasoning").textContent =
-    `This is placeholder reasoning. In Stage 3, Claude will explain in 2-4 sentences why ${winner} wins.`;
+  document.getElementById("image-a").src = A.image;
+  document.getElementById("image-a").alt = A.name;
+  document.getElementById("caption-a").textContent = A.name;
 
-  document.getElementById("image-a").src = placeholderImage(fighterA);
-  document.getElementById("image-a").alt = fighterA;
-  document.getElementById("caption-a").textContent = fighterA;
-
-  document.getElementById("image-b").src = placeholderImage(fighterB);
-  document.getElementById("image-b").alt = fighterB;
-  document.getElementById("caption-b").textContent = fighterB;
+  document.getElementById("image-b").src = B.image;
+  document.getElementById("image-b").alt = B.name;
+  document.getElementById("caption-b").textContent = B.name;
 
   showView("result");
 }
@@ -54,8 +41,52 @@ function showError(message) {
   showView("error");
 }
 
+// Call the fight API. Returns the parsed result, or throws an Error whose
+// message is safe to show the user.
+async function requestFight(fighterA, fighterB) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  let response;
+  try {
+    response = await fetch("/api/fight", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fighterA, fighterB }),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error("The judge is taking too long. Please try again.");
+    }
+    throw new Error("Couldn't reach the arena. Check your connection and try again.");
+  } finally {
+    clearTimeout(timer);
+  }
+
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    // fall through to the generic message below
+  }
+
+  if (!response.ok) {
+    // The server sends a specific message per error type
+    // (bad_request, rate_limited, verdict_failed, image_failed, image_blocked).
+    throw new Error(data?.error?.message || "Something went wrong. Please try again.");
+  }
+  if (!data || !data.fighters || (data.winner !== "A" && data.winner !== "B")) {
+    throw new Error("The judge's verdict got garbled. Please try again.");
+  }
+  return data;
+}
+
 // Fight button
-document.getElementById("fight-form").addEventListener("submit", (event) => {
+const fightForm = document.getElementById("fight-form");
+const fightButton = fightForm.querySelector("button[type=submit]");
+
+fightForm.addEventListener("submit", async (event) => {
   event.preventDefault(); // stop the page from reloading
 
   const fighterA = document.getElementById("fighter-a").value.trim();
@@ -66,10 +97,16 @@ document.getElementById("fight-form").addEventListener("submit", (event) => {
     return;
   }
 
+  fightButton.disabled = true;
   showView("loading");
 
-  // Pretend we're waiting on the API. Stage 3 replaces this with a real call.
-  setTimeout(() => showFakeResult(fighterA, fighterB), 1500);
+  try {
+    showResult(await requestFight(fighterA, fighterB));
+  } catch (err) {
+    showError(err.message);
+  } finally {
+    fightButton.disabled = false;
+  }
 });
 
 // "New fight" and "Try again" both go back to the form.
