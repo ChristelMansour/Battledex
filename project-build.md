@@ -51,25 +51,20 @@ We build one stage at a time and only move on when the current stage passes its 
 
 ---
 
-## Stage 3 — Fight API (verdict + art + rate limiting)
+## Stage 3 — Fight API (verdict + placeholder art + rate limiting)
 
-**Goal:** One function, one call, real winner + reasoning + one image per side, end to end.
+**Goal:** One function, one call, real winner + reasoning + one placeholder image per side, end to end. No real images in this build (training project, kept free): OpenAI is never called.
 
 - `api/fight.js` serverless function: takes `{ fighterA, fighterB }`
-- Rate limit check runs first, before calling either API — key by IP, 5 requests/minute per project-brief.md §6, return 429 with a clear message when exceeded
-- Calls Claude for the verdict (using the Stage 2 system prompt) and OpenAI image API for both fighters' art
+- Rate limit check runs first, before calling Claude — key by IP, 5 requests/minute per project-brief.md §6, return 429 with a clear message when exceeded
+- Calls Claude for the verdict (using the Stage 2 system prompt). Images are always placeholders generated server-side (e.g. the Stage 1 SVG letter tiles), returned in the same response shape real images would use, so real art can be swapped in later without touching the frontend
 - Verdict output (winner, reasoning) enforced via a zod schema, not JSON-format instructions in the prompt
-- Store both API keys in env vars, never in client code
-- Group inputs (e.g. "10 cows") still produce exactly one image for that side — handled in the prompt sent to the image API, not by looping
-- Every image generated must follow one shared art style template, appended to each fighter's image prompt (not left to the model's default style):
-
-  > 16-bit pixel art illustration, retro video game sprite style, bold outlined pixels, vibrant limited color palette, dynamic action pose. Depicted as one cohesive image, centered, filling most of the frame, isolated on a plain solid color background with no scenery. No text, words, letters, numbers, logos, watermarks, UI elements, borders, or frames.
-
-- Fake mode (per brief §6): `FAKE_API=true` in `.env.local`, on by default. Runs the same flow (input checks, rate limit, response shape, errors) but returns a canned verdict and placeholder images with no Claude/OpenAI calls. Can simulate each error type (verdict failure, image failure, moderation block). Build and test the whole stage in fake mode first; turn it off only for a few final real checks
+- Store the Anthropic API key in an env var, never in client code
+- Fake mode (per brief §6): `FAKE_API=true` in `.env.local`, on by default. Runs the same flow (input checks, rate limit, response shape, errors) but returns a canned verdict with no Claude call. Can simulate each error type (verdict failure, image failure, moderation block). Build and test the whole stage in fake mode first; turn it off only for a few final real verdict checks
 - Wire Fight button to call `/api/fight` instead of the fake timeout
-- Handle errors distinctly in the UI: verdict failure, image failure, moderation-blocked (image request rejected by OpenAI's content moderation — distinct message from a generic image failure), rate-limit 429 — don't hang on loading forever
+- Handle errors distinctly in the UI: verdict failure, image failure, moderation-blocked (distinct message from a generic image failure; only reachable via fake mode until real images are added), rate-limit 429 — don't hang on loading forever
 
-**Done when:** In fake mode, the full flow works end to end: canned result shows, each simulated error shows its own message, and hammering Fight 6x in a minute from one IP gets blocked on the 6th and resets after a minute. Then, with fake mode off for a few calls, typing two real fighters returns winner + reasoning + one image per side from a single call, both images following the shared art style template.
+**Done when:** In fake mode, the full flow works end to end: canned result shows, each simulated error shows its own message, and hammering Fight 6x in a minute from one IP gets blocked on the 6th and resets after a minute. Then, with fake mode off for a few calls, typing two real fighters returns a real Claude winner + reasoning, with one placeholder image per side, from a single call.
 
 ---
 
@@ -130,3 +125,4 @@ We build one stage at a time and only move on when the current stage passes its 
 - Deploying to Vercel
 - Real backend / cross-device BattleDex sync
 - Quick re-fight using saved BattleDex characters
+- Real AI character art (OpenAI image API, shared pixel-art style template, one image per side even for groups — see brief §6). Placeholders until then
